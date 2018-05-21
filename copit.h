@@ -67,7 +67,7 @@ COPIT_FUNC(fg, unsigned char c) {
         CONSOLE_SCREEN_BUFFER_INFO csbi;
         if(GetConsoleScreenBufferInfo(wterm, &csbi)) {
             WORD colors = csbi.wAttributes;
-            SetConsoleTextAttribute(wterm, (colors & 0bF0) | c);
+            SetConsoleTextAttribute(wterm, (colors & 0xF0) | c);
         }
         return "";
     #else
@@ -83,7 +83,7 @@ COPIT_FUNC(bg, unsigned char c) {
         CONSOLE_SCREEN_BUFFER_INFO csbi;
         if(GetConsoleScreenBufferInfo(wterm, &csbi)) {
             WORD colors = csbi.wAttributes;
-            SetConsoleTextAttribute(wterm, (colors & 0b0F) | (c << 4));
+            SetConsoleTextAttribute(wterm, (colors & 0x0F) | (c << 4));
         }
         return "";
     #else
