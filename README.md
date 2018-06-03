@@ -6,7 +6,7 @@ Windows support is **untested**.
 Copit supports both C and C++ and will adjust it's API for the language used.  
 In C++, Copit will use namespaces (`copit::fg`) instead of C-namespaces (`copit_fg`).  
 So switching between API modes is self-explanatory.  
-Each function in the API **must** return a `const char*` (including `copit::init`, which returns an empty string).  
+Each function in the API **will** return a `const char*` (including `copit::init`, which returns an empty string).  
 This is so that it may be used in `printf` or `std::cout`.
 
 	// Functions.
