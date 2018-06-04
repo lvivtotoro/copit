@@ -4,15 +4,20 @@
 #ifdef _WIN32
     #include<windows.h>
     static HANDLE wterm;
+#else
+    #include<termios.h>
+    #include<unistd.h>
 #endif
 
 #ifdef __cplusplus
     #define COPIT_FUNC(name, ...) inline const char* name(__VA_ARGS__)
     #define COPIT_CHAR(name) unsigned char name
+    #define COPIT_GETFUNC(name) name
     namespace copit {
 #else
     #define COPIT_FUNC(name, ...) static const char* copit_##name (__VA_ARGS__)
     #define COPIT_CHAR(name) unsigned char copit_##name
+    #define COPIT_GETFUNC(name) copit_##name
 #endif
 
 #ifdef _WIN32
@@ -54,6 +59,11 @@
 COPIT_FUNC(init) {
     #ifdef _WIN32
         wterm = GetStdHandle(STD_OUTPUT_HANDLE);
+    #else
+        struct termios term;
+        tcgetattr(STDIN_FILENO, &term);
+        term.c_lflag &= ~(ICANON | ECHO);
+        tcsetattr(STDIN_FILENO, TCSANOW, &term);
     #endif
     return "";
 }
@@ -89,12 +99,55 @@ COPIT_FUNC(bg, unsigned char c) {
     #else
         c += 10;
 
-        static char buf[8];
+        static char buf[16];
         int bright = c & 0b10000000;
         if(bright) c += 60;
         sprintf(buf, "\33[%im", (int) (c & ~0b10000000));
         return buf;
     #endif
+}
+
+COPIT_FUNC(setcur, unsigned short x, unsigned short y) {
+    #ifdef _WIN32
+        COORD coord{x, y};
+        SetConsoleCursorPosition(wterm, coord);
+    #else
+        static char buf[16];
+        sprintf(buf, "\33[%i;%iH", y, x);
+        return buf;
+    #endif
+}
+
+/**
+ * On Linux, make sure the input stream is empty before calling this function.
+ */
+COPIT_FUNC(getcur, unsigned short* x, unsigned short* y) {
+    #ifdef _WIN32
+        CONSOLE_SCREEN_BUFFER_INFO conscrbufinfo;
+        GetConsoleScreenBufferInfo(wterm, &conscrbufinfo);
+        COORD coord = conscrbufinfo.dwCursorPosition;
+        *x = coord.x;
+        *y = coord.y;
+    #else
+        printf("\33[6n");
+        scanf("\33[%hu;%huR", y, x);
+    #endif
+    return "";
+}
+
+COPIT_FUNC(getsize, unsigned short* w, unsigned short* h) {
+    #ifdef _WIN32
+
+    #else
+        // setcur values are clamped to the edge of the console.
+        // we use this to our advantage, so we pick a non-arbitrary large number.
+        unsigned short x, y;
+        COPIT_GETFUNC(getcur)(&x, &y);
+        printf("%s", COPIT_GETFUNC(setcur)((unsigned short) 0x464F5247, (unsigned short) 0x4956452E));
+        COPIT_GETFUNC(getcur)(w, h);
+        printf("%s", COPIT_GETFUNC(setcur)(x, y));
+    #endif
+    return "";
 }
 
 #ifdef __cplusplus
@@ -103,5 +156,6 @@ COPIT_FUNC(bg, unsigned char c) {
 
 #undef COPIT_FUNC
 #undef COPIT_CHAR
+#undef COPIT_GETFUNC
 
 #endif // COPIT_H_INCLUDED
