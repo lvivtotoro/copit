@@ -10,15 +10,19 @@ Each function in the API **will** return a `const char*` (including `copit::init
 This is so that it may be used in `printf` or `std::cout`.
 
 	// Functions.
-	
-    copit::init(); // For Windows.
+    copit::init(); // Turns off input buffer on Linux, gets HANDLE on Windows.
 	
 	copit::line_return(); // Returns `\r`.
 	copit::fg(color); // Sets the foreground color. View below section for possible values.
 	copit::bg(color); // Sets the background color. View below section for possible values.
 
-	// Possible colors. Do not use their internal values, as they are different for each system.
+	// On non-Win systems, ANSI escape sequences shall be RETURNED.
+	// On Windows, relevant Win32 functions shall be CALLED and shall RETURN an empty string.
+	// To maintain portability, it's best to print the return values of copit functions.
+	// Getters also return empty strings, but the real "getted" values are returned via pointers.
+	// So rule: Always print the return values of copit functions!
 
+	// Possible colors. Do not use their internal values, as they are different for each system.
     copit::black
     copit::blue
     copit::green
