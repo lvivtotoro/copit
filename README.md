@@ -9,42 +9,44 @@ So switching between API modes is self-explanatory.
 Each function in the API **will** return a `const char*` (including `copit::init`, which returns an empty string).  
 This is so that it may be used in `printf` or `std::cout`.
 
-	// Functions.
-    copit::init(); // Turns off input buffer on Linux, gets HANDLE on Windows.
-	
-	copit::line_return(); // Returns `\r`.
-	copit::fg(color); // Sets the foreground color. View below section for possible values.
-	copit::bg(color); // Sets the background color. View below section for possible values.
+```cpp
+// Functions.
+copit::init(); // Turns off input buffer on Linux, gets HANDLE on Windows.
 
-	copit::setcur(5, 6); // Sets the terminal cursor position to (5; 6).
-	copit::getcur(&x, &y); // Gets the terminal cursor position into x and y.
-	copit::getsize(&w, &h); // Gets the terminal size into w and h. Make sure stdin is empty on Linux before calling this function.
+copit::line_return(); // Returns `\r`.
+copit::fg(color); // Sets the foreground color. View below section for possible values.
+copit::bg(color); // Sets the background color. View below section for possible values.
 
-	copit::deinit(); // Resets terminal settings on Linux.
+copit::setcur(5, 6); // Sets the terminal cursor position to (5; 6).
+copit::getcur(&x, &y); // Gets the terminal cursor position into x and y.
+copit::getsize(&w, &h); // Gets the terminal size into w and h. Make sure stdin is empty on Linux before calling this function.
 
-	// On non-Win systems, ANSI escape sequences shall be RETURNED.
-	// On Windows, relevant Win32 functions shall be CALLED and shall RETURN an empty string.
-	// To maintain portability, it's best to print the return values of copit functions.
-	// Getters also return empty strings, but the real "getted" values are returned via pointers.
-	// So rule: Always print the return values of copit functions!
+copit::deinit(); // Resets terminal settings on Linux.
 
-	// Possible colors. Do not use their internal values, as they are different for each system.
-    copit::black
-    copit::blue
-    copit::green
-    copit::aqua
-    copit::red
-    copit::purple
-    copit::yellow
-    copit::white
-    copit::gray
-    copit::lightblue
-    copit::lightgreen
-    copit::lightaqua
-    copit::lightred
-    copit::lightpurple
-    copit::lightyellow
-    copit::lightwhite
+// On non-Win systems, ANSI escape sequences shall be RETURNED.
+// On Windows, relevant Win32 functions shall be CALLED and shall RETURN an empty string.
+// To maintain portability, it's best to print the return values of copit functions.
+// Getters also return empty strings, but the real "getted" values are returned via pointers.
+// So rule: Always print the return values of copit functions!
+
+// Possible colors. Do not use their internal values, as they are different for each system.
+copit::black
+copit::blue
+copit::green
+copit::aqua
+copit::red
+copit::purple
+copit::yellow
+copit::white
+copit::gray
+copit::lightblue
+copit::lightgreen
+copit::lightaqua
+copit::lightred
+copit::lightpurple
+copit::lightyellow
+copit::lightwhite
+```
 
 ## License
 
