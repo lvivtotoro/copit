@@ -46,4 +46,5 @@ This is so that it may be used in `printf` or `std::cout`.
 
 ## License
 
-You may use Copit under the terms of the [Expat License](https://github.com/lvivtotoro/copit/blob/master/LICENSE).
+You may use Copit under the terms of the [Expat License](https://github.com/lvivtotoro/copit/blob/master/LICENSE).  
+Note, that GitHub mistakenly calls this the MIT License, which is incorrect.
