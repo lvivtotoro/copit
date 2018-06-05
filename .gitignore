@@ -1,4 +1,7 @@
 
+### Forgotten by Gitignore.io ###
+*.cbp
+
 # Created by https://www.gitignore.io/api/c,c++,eclipse,intellij,codeblocks
 
 ### C ###

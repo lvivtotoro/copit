@@ -109,8 +109,9 @@ COPIT_FUNC(bg, unsigned char c) {
 
 COPIT_FUNC(setcur, unsigned short x, unsigned short y) {
     #ifdef _WIN32
-        COORD coord{x, y};
+        COORD coord{(short) x, (short) y};
         SetConsoleCursorPosition(wterm, coord);
+        return "";
     #else
         static char buf[16];
         sprintf(buf, "\33[%i;%iH", y, x);
@@ -126,8 +127,8 @@ COPIT_FUNC(getcur, unsigned short* x, unsigned short* y) {
         CONSOLE_SCREEN_BUFFER_INFO conscrbufinfo;
         GetConsoleScreenBufferInfo(wterm, &conscrbufinfo);
         COORD coord = conscrbufinfo.dwCursorPosition;
-        *x = coord.x;
-        *y = coord.y;
+        *x = coord.X;
+        *y = coord.Y;
     #else
         printf("\33[6n");
         scanf("\33[%hu;%huR", y, x);
@@ -137,7 +138,10 @@ COPIT_FUNC(getcur, unsigned short* x, unsigned short* y) {
 
 COPIT_FUNC(getsize, unsigned short* w, unsigned short* h) {
     #ifdef _WIN32
-
+        CONSOLE_SCREEN_BUFFER_INFO conscrbufinfo;
+        GetConsoleScreenBufferInfo(wterm, &conscrbufinfo);
+        *w = conscrbufinfo.srWindow.Right - conscrbufinfo.srWindow.Left + 1;
+        *h = conscrbufinfo.srWindow.Bottom - conscrbufinfo.srWindow.Top + 1;
     #else
         // setcur values are clamped to the edge of the console.
         // we use this to our advantage, so we pick a non-arbitrary large number.
