@@ -16,6 +16,10 @@ This is so that it may be used in `printf` or `std::cout`.
 	copit::fg(color); // Sets the foreground color. View below section for possible values.
 	copit::bg(color); // Sets the background color. View below section for possible values.
 
+	copit::setcur(5, 5); // Sets the terminal cursor position to (5;5).
+	copit::getcur(&x, &y); // Gets the terminal cursor position into x and y.
+	copit::getsize(&w, &h); // Gets the terminal size into w and h. Make sure stdin is empty on Linux before calling this function.
+
 	// On non-Win systems, ANSI escape sequences shall be RETURNED.
 	// On Windows, relevant Win32 functions shall be CALLED and shall RETURN an empty string.
 	// To maintain portability, it's best to print the return values of copit functions.
