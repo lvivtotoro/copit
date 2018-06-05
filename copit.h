@@ -7,6 +7,7 @@
 #else
     #include<termios.h>
     #include<unistd.h>
+    static struct termios lterm;
 #endif
 
 #ifdef __cplusplus
@@ -15,7 +16,11 @@
     #define COPIT_GETFUNC(name) name
     namespace copit {
 #else
-    #define COPIT_FUNC(name, ...) static const char* copit_##name (__VA_ARGS__)
+    #ifdef __GNUC__
+        #define COPIT_FUNC(name, ...) __attribute__((unused)) static const char* copit_##name (__VA_ARGS__)
+    #else
+        #define COPIT_FUNC(name, ...) static const char* copit_##name (__VA_ARGS__)
+    #endif
     #define COPIT_CHAR(name) unsigned char copit_##name
     #define COPIT_GETFUNC(name) copit_##name
 #endif
@@ -46,24 +51,26 @@
     COPIT_CHAR(purple) = 35;
     COPIT_CHAR(yellow) = 33;
     COPIT_CHAR(white) = 37;
-    COPIT_CHAR(gray) = 37 | 0b10000000;
-    COPIT_CHAR(lightblue) = 34 | 0b10000000;
-    COPIT_CHAR(lightgreen) = 32 | 0b10000000;
-    COPIT_CHAR(lightaqua) = 36 | 0b10000000;
-    COPIT_CHAR(lightred) = 31 | 0b10000000;
-    COPIT_CHAR(lightpurple) = 35 | 0b10000000;
-    COPIT_CHAR(lightyellow) = 33 | 0b10000000;
-    COPIT_CHAR(lightwhite) = 37 | 0b10000000;
+    COPIT_CHAR(gray) = 90;
+    COPIT_CHAR(lightblue) = 94;
+    COPIT_CHAR(lightgreen) = 92;
+    COPIT_CHAR(lightaqua) = 96;
+    COPIT_CHAR(lightred) = 91;
+    COPIT_CHAR(lightpurple) = 95;
+    COPIT_CHAR(lightyellow) = 93;
+    COPIT_CHAR(lightwhite) = 97;
 #endif
 
 COPIT_FUNC(init) {
     #ifdef _WIN32
         wterm = GetStdHandle(STD_OUTPUT_HANDLE);
     #else
-        struct termios term;
-        tcgetattr(STDIN_FILENO, &term);
-        term.c_lflag &= ~(ICANON | ECHO);
-        tcsetattr(STDIN_FILENO, TCSANOW, &term);
+        tcgetattr(STDIN_FILENO, &lterm);
+
+        struct termios newTerm;
+        tcgetattr(STDIN_FILENO, &newTerm);
+        newTerm.c_lflag &= ~(ICANON | ECHO);
+        tcsetattr(STDIN_FILENO, TCSANOW, &newTerm);
     #endif
     return "";
 }
@@ -82,8 +89,7 @@ COPIT_FUNC(fg, unsigned char c) {
         return "";
     #else
         static char buf[8];
-        int bright = c & 0b10000000;
-        sprintf(buf, "\33[%i;%sm", (int) (c & ~0b10000000), bright ? "1" : "22");
+        sprintf(buf, "\33[%im", (int) c);
         return buf;
     #endif
 }
@@ -100,9 +106,7 @@ COPIT_FUNC(bg, unsigned char c) {
         c += 10;
 
         static char buf[16];
-        int bright = c & 0b10000000;
-        if(bright) c += 60;
-        sprintf(buf, "\33[%im", (int) (c & ~0b10000000));
+        sprintf(buf, "\33[%im", (int) c);
         return buf;
     #endif
 }
@@ -150,6 +154,14 @@ COPIT_FUNC(getsize, unsigned short* w, unsigned short* h) {
         printf("%s", COPIT_GETFUNC(setcur)((unsigned short) 0x464F5247, (unsigned short) 0x4956452E));
         COPIT_GETFUNC(getcur)(w, h);
         printf("%s", COPIT_GETFUNC(setcur)(x, y));
+    #endif
+    return "";
+}
+
+COPIT_FUNC(deinit) {
+    #ifdef _WIN32
+    #else
+        tcsetattr(STDIN_FILENO, TCSANOW, &lterm);
     #endif
     return "";
 }
