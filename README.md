@@ -1,6 +1,6 @@
 # Copit
 Yet another terminal library but it actually ~~will have features others don't~~.  
-Windows support is **untested**.
+Windows support is currently **tested**.
 
 ## Usage
 Copit supports both C and C++ and will adjust it's API for the language used.  
